@@ -10,6 +10,9 @@
     "@types/node": "^16.11.46",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
+    "antd": "^4.22.2",
+    "dexie": "^3.2.2",
+    "dexie-react-hooks": "^1.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -51,7 +54,7 @@
     "lint-staged": "^13.0.3",
     "prettier": "2.7.1"
   },
-  "lint-staged":{
+  "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
       "npx prettier --write",
       "npx eslint --fix"
