@@ -86,8 +86,6 @@
         "prefer-spread": "error",
         "prefer-template": "error",
         "require-await": "error",
-        "sort-keys": "error",
-        "sort-vars": "error",
         "spaced-comment": "error",
         "yoda": "error",
         "react/react-in-jsx-scope": "off",
