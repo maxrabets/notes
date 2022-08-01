@@ -2,6 +2,18 @@
 	background-color: lightgray;
 	height: 100vh;
 
+	button {
+		background-color: dimgray;
+		border-color: dimgray;
+		color: black;
+
+		&:active, &:hover, &:focus {
+			background-color: gray;
+			border-color: gray;
+			color: lightgray;
+		}
+	}
+
 	.sidebar {
 		width: 20%;
 	}

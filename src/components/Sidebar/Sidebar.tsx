@@ -1,14 +1,16 @@
-import { Button } from "antd";
+import { Button, Modal } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useCallback, useState } from "react";
 import { INote } from "../../types";
 import NoteListItem from "../NoteListItem/NoteListItem";
-import "./Sidebar.scss";
 import { generateId } from "../../utils";
+import "./Sidebar.scss";
 
 const Sidebar = () => {
 	const [notes, setNotes] = useState<INote[]>([]);
-	const [selectedNoteId, setSelectedNoteId] = useState<string>();
+	const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
+	const [isDeleteConfirmationModalOpen, setIsDeleteConfirmationModalOpen] =
+		useState(false);
 
 	const onAdd = useCallback(() => {
 		setNotes((notes) =>
@@ -31,7 +33,19 @@ const Sidebar = () => {
 				return newNotes;
 			});
 		}
+		setSelectedNoteId(null);
+		setIsDeleteConfirmationModalOpen(false);
 	}, [selectedNoteId]);
+
+	const openDeleteConfirmationModal = useCallback(() => {
+		if (selectedNoteId) {
+			setIsDeleteConfirmationModalOpen(true);
+		}
+	}, [selectedNoteId]);
+
+	const closeDeleteConfirmationModal = useCallback(() => {
+		setIsDeleteConfirmationModalOpen(false);
+	}, []);
 
 	return (
 		<div className="sidebar">
@@ -42,12 +56,14 @@ const Sidebar = () => {
 					icon={<PlusOutlined />}
 					onClick={onAdd}
 				/>
-				<Button
-					type="primary"
-					shape="circle"
-					icon={<DeleteOutlined />}
-					onClick={onDelete}
-				/>
+				{selectedNoteId && (
+					<Button
+						type="primary"
+						shape="circle"
+						icon={<DeleteOutlined />}
+						onClick={openDeleteConfirmationModal}
+					/>
+				)}
 			</div>
 			{notes.map((note) => (
 				<NoteListItem
@@ -59,6 +75,16 @@ const Sidebar = () => {
 					}}
 				/>
 			))}
+			<Modal
+				title="Confirmation"
+				visible={isDeleteConfirmationModalOpen}
+				onOk={onDelete}
+				onCancel={closeDeleteConfirmationModal}
+			>
+				{`Confirm you want to delete note	${
+					notes.find((note) => note.id === selectedNoteId)?.title
+				}`}
+			</Modal>
 		</div>
 	);
 };
