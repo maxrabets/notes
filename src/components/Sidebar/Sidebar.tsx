@@ -1,39 +1,34 @@
 import { Button, Modal } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useState } from "react";
-import { INote } from "../../types";
 import NoteListItem from "../NoteListItem/NoteListItem";
 import { generateId } from "../../utils";
+import { db } from "../../db";
+
 import "./Sidebar.scss";
 
 const Sidebar = () => {
-	const [notes, setNotes] = useState<INote[]>([]);
 	const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
 	const [isDeleteConfirmationModalOpen, setIsDeleteConfirmationModalOpen] =
 		useState(false);
+	const notes = useLiveQuery(() => db.notes.toArray(), []);
 
-	const onAdd = useCallback(() => {
-		setNotes((notes) =>
-			notes.concat({
-				title: "New note",
-				dateEdited: new Date(),
-				id: generateId(),
-			})
-		);
+	const onAdd = useCallback(async () => {
+		const newNote = {
+			title: "New note",
+			dateEdited: new Date(),
+			id: generateId(),
+		};
+
+		await db.notes.add(newNote);
 	}, []);
 
-	const onDelete = useCallback(() => {
+	const onDelete = useCallback(async () => {
 		if (selectedNoteId) {
-			setNotes((notes) => {
-				const deleteCount = 1;
-				const newNotes = notes.slice();
-				const index = newNotes.findIndex((note) => note.id === selectedNoteId);
-				newNotes.splice(index, deleteCount);
-
-				return newNotes;
-			});
+			await db.notes.where("id").equals(selectedNoteId).delete();
+			setSelectedNoteId(null);
 		}
-		setSelectedNoteId(null);
 		setIsDeleteConfirmationModalOpen(false);
 	}, [selectedNoteId]);
 
@@ -65,7 +60,7 @@ const Sidebar = () => {
 					/>
 				)}
 			</div>
-			{notes.map((note) => (
+			{notes?.map((note) => (
 				<NoteListItem
 					note={note}
 					key={note.id}
@@ -82,7 +77,7 @@ const Sidebar = () => {
 				onCancel={closeDeleteConfirmationModal}
 			>
 				{`Confirm you want to delete note	${
-					notes.find((note) => note.id === selectedNoteId)?.title
+					notes?.find((note) => note.id === selectedNoteId)?.title
 				}`}
 			</Modal>
 		</div>
