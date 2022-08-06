@@ -1,20 +1,26 @@
 .App {
 	background-color: lightgray;
 	height: 100vh;
-
-	button {
-		background-color: dimgray;
-		border-color: dimgray;
-		color: black;
-
-		&:active, &:hover, &:focus {
-			background-color: gray;
-			border-color: gray;
-			color: lightgray;
-		}
-	}
+	display: flex;
 
 	.sidebar {
 		width: 20%;
+		border-right: black solid 2px;
+		height: 100%;
+
+		.sidebar-buttons {
+			height: 50px;
+			background-color: darkgray;
+		}
+
+		.notes-list {
+			max-height: calc(100% - 50px);
+			overflow-y: scroll;
+		}
+	}
+
+	.workspace {
+			width: 80%;
+			height: 100%;
 	}
 }

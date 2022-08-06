@@ -1,0 +1,32 @@
+.workspace {
+	height: 100%;
+
+	& > div {
+		width: 100%;
+		height: 100%;
+	}
+
+	.content {
+		padding: 30px;
+		overflow-y: scroll;
+	}
+
+	.EasyMDEContainer {
+		height: 100%;
+
+		.editor-toolbar {
+			height: 50px;
+			background-color: darkgray;
+			border: none;
+			border-radius: 0;
+		}
+
+		.CodeMirror {
+			height: calc(100% - 90px);
+		}
+
+		.editor-statusbar {
+			height: 40px;
+		}
+	}
+}

@@ -1,26 +1,28 @@
-import { FC } from "react";
+import React, { FC } from "react";
+import NotesContext from "../../NotesContext";
 import { INote } from "../../types";
 import "./NoteListItem.scss";
 
 interface INoteListItemProps {
 	note: INote;
 	isSelected: boolean;
-	onClick: () => void;
 }
 
-const NoteListItem: FC<INoteListItemProps> = ({
-	note,
-	isSelected,
-	onClick,
-}) => {
+const NoteListItem: FC<INoteListItemProps> = ({ note, isSelected }) => {
 	return (
-		<div
-			className={`note-list-item ${isSelected ? "selected" : ""}`}
-			onClick={onClick}
-		>
-			<p>{note.title}</p>
-			<p>{note.dateEdited.toLocaleString()}</p>
-		</div>
+		<NotesContext.Consumer>
+			{({ setSelectedNoteId }) => (
+				<div
+					className={`note-list-item ${isSelected ? "selected" : ""}`}
+					onClick={() => {
+						if (setSelectedNoteId) setSelectedNoteId(note.id);
+					}}
+				>
+					<p>{note.title}</p>
+					<p>{note.dateEdited.toLocaleString()}</p>
+				</div>
+			)}
+		</NotesContext.Consumer>
 	);
 };
 

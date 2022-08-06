@@ -1,42 +1,40 @@
 import { Button, Modal } from "antd";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useLiveQuery } from "dexie-react-hooks";
-import { useCallback, useState } from "react";
+import {
+	PlusOutlined,
+	DeleteOutlined,
+	EditOutlined,
+	EyeOutlined,
+} from "@ant-design/icons";
+import { useCallback, useContext, useState } from "react";
 import NoteListItem from "../NoteListItem/NoteListItem";
-import { generateId } from "../../utils";
-import { db } from "../../db";
+import NotesContext from "../../NotesContext";
 
 import "./Sidebar.scss";
 
 const Sidebar = () => {
-	const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
 	const [isDeleteConfirmationModalOpen, setIsDeleteConfirmationModalOpen] =
 		useState(false);
-	const notes = useLiveQuery(() => db.notes.toArray(), []);
+	const {
+		notes,
+		selectedNoteId,
+		addNote,
+		deleteNote,
+		isEditMode,
+		setIsEditMode,
+	} = useContext(NotesContext);
 
-	const onAdd = useCallback(async () => {
-		const newNote = {
-			title: "New note",
-			dateEdited: new Date(),
-			id: generateId(),
-		};
+	const toggleEdit = useCallback(() => {
+		setIsEditMode(!isEditMode);
+	}, [isEditMode]);
 
-		await db.notes.add(newNote);
-	}, []);
-
-	const onDelete = useCallback(async () => {
-		if (selectedNoteId) {
-			await db.notes.where("id").equals(selectedNoteId).delete();
-			setSelectedNoteId(null);
-		}
+	const onDeleteNote = useCallback(async () => {
+		await deleteNote(selectedNoteId);
 		setIsDeleteConfirmationModalOpen(false);
 	}, [selectedNoteId]);
 
 	const openDeleteConfirmationModal = useCallback(() => {
-		if (selectedNoteId) {
-			setIsDeleteConfirmationModalOpen(true);
-		}
-	}, [selectedNoteId]);
+		setIsDeleteConfirmationModalOpen(true);
+	}, []);
 
 	const closeDeleteConfirmationModal = useCallback(() => {
 		setIsDeleteConfirmationModalOpen(false);
@@ -45,35 +43,40 @@ const Sidebar = () => {
 	return (
 		<div className="sidebar">
 			<div className="sidebar-buttons">
-				<Button
-					type="primary"
-					shape="circle"
-					icon={<PlusOutlined />}
-					onClick={onAdd}
-				/>
+				<Button shape="circle" icon={<PlusOutlined />} onClick={addNote} />
 				{selectedNoteId && (
 					<Button
-						type="primary"
 						shape="circle"
 						icon={<DeleteOutlined />}
 						onClick={openDeleteConfirmationModal}
 					/>
 				)}
+				{selectedNoteId && (
+					<Button
+						shape="circle"
+						icon={isEditMode ? <EyeOutlined /> : <EditOutlined />}
+						onClick={toggleEdit}
+					/>
+				)}
 			</div>
-			{notes?.map((note) => (
-				<NoteListItem
-					note={note}
-					key={note.id}
-					isSelected={selectedNoteId === note.id}
-					onClick={() => {
-						setSelectedNoteId(note.id);
-					}}
-				/>
-			))}
+			<div className="notes-list">
+				{notes
+					?.sort(
+						(note1, note2) =>
+							note2.dateEdited.getTime() - note1.dateEdited.getTime()
+					)
+					.map((note) => (
+						<NoteListItem
+							note={note}
+							key={note.id}
+							isSelected={selectedNoteId === note.id}
+						/>
+					))}
+			</div>
 			<Modal
 				title="Confirmation"
 				visible={isDeleteConfirmationModalOpen}
-				onOk={onDelete}
+				onOk={onDeleteNote}
 				onCancel={closeDeleteConfirmationModal}
 			>
 				{`Confirm you want to delete note	${
