@@ -3,7 +3,12 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "./db";
 import Sidebar from "./components/Sidebar/Sidebar";
 import NotesContext, { INotesContext } from "./NotesContext";
-import { addNote, deleteNote, setNoteContent } from "./notesService";
+import {
+	addNote,
+	deleteNote,
+	setNoteContent,
+	setNoteTitle,
+} from "./notesService";
 import { INote } from "./types";
 import { generateId } from "./utils";
 import Workspace from "./components/Workspace/Workspace";
@@ -38,6 +43,7 @@ const App = () => {
 			setNoteContent,
 			isEditMode,
 			setIsEditMode,
+			setNoteTitle,
 		};
 	}, [selectedNoteId, notes, isEditMode]);
 

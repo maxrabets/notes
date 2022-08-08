@@ -19,7 +19,7 @@
     },
     "plugins": ["react", "@typescript-eslint"],
     "rules": {
-        "indent": ["error", "tab"],
+        "indent": "off",
         "linebreak-style": ["error", "unix"],
         "quotes": ["error", "double"],
         "semi": ["error", "always"],
@@ -85,7 +85,7 @@
         "prefer-object-spread": "error",
         "prefer-rest-params": "error",
         "prefer-spread": "error",
-        "prefer-template": "error",
+        "prefer-template": "off",
         "require-await": "error",
         "spaced-comment": "error",
         "yoda": "error",
@@ -121,5 +121,5 @@
         "react/jsx-pascal-case": "error",
         "react/jsx-props-no-multi-spaces": "error"
     },
-    "noInlineConfig": true
+    "noInlineConfig": false
 }

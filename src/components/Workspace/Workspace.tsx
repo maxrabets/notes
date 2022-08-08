@@ -1,17 +1,32 @@
 import SimpleMDE from "react-simplemde-editor";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+	ChangeEvent,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
+import { Input } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import EasyMDE from "easymde";
 import { marked } from "marked";
-import NotesContext from "../../NotesContext";
 import { Position } from "codemirror";
+import NotesContext from "../../NotesContext";
+import { setNoteTitle } from "../../notesService";
+import { Highlighter } from "../../Highliter";
 
 import "./Workspace.scss";
 
 const Workspace = () => {
 	const { notes, selectedNoteId, setNoteContent, isEditMode } =
 		useContext(NotesContext);
+	const selectedNote = useMemo(
+		() => notes.find((note) => note.id === selectedNoteId),
+		[notes, selectedNoteId]
+	);
 	const selectedNoteContent = useMemo(
-		() => notes.find((note) => note.id === selectedNoteId)?.content || "",
+		() => selectedNote?.content || "",
 		[notes, selectedNoteId]
 	);
 	const editorOptions: EasyMDE.Options = useMemo(() => {
@@ -22,19 +37,42 @@ const Workspace = () => {
 			},
 		};
 	}, [selectedNoteContent]);
-	const [value, setValue] = useState(selectedNoteContent);
+	const [content, setContent] = useState(selectedNoteContent);
+	const [title, setTitle] = useState(selectedNote?.title);
+	const [searchValue, setSearchValue] = useState("");
 	const [cursor, setCursor] = useState<Position | null>(null);
+	const highlighter = new Highlighter(".contentArea");
 
 	useEffect(() => {
-		setValue(selectedNoteContent);
+		setContent(selectedNoteContent);
+		if (selectedNote) {
+			setTitle(selectedNote.title);
+		}
 	}, [selectedNoteId]);
 
-	const onChange = useCallback(
+	const onContentChange = useCallback(
 		async (value: string) => {
-			setValue(value);
+			setContent(value);
 			await setNoteContent(selectedNoteId, value);
 		},
-		[selectedNoteId, cursor]
+		[selectedNoteId]
+	);
+
+	const onTitleChange = useCallback(
+		async (e: ChangeEvent<HTMLInputElement>) => {
+			setTitle(e.target.value);
+			await setNoteTitle(selectedNoteId, e.target.value);
+		},
+		[selectedNoteId]
+	);
+
+	const onSearchValueChange = useCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const value = e.target.value;
+			setSearchValue(value);
+			highlighter.apply(value);
+		},
+		[selectedNoteId]
 	);
 
 	const getLineAndCursorCallback = useCallback(
@@ -65,28 +103,41 @@ const Workspace = () => {
 		[cursor]
 	);
 
-	if (!isEditMode) {
-		return (
-			<div className="workspace">
-				<div
-					className="content"
-					dangerouslySetInnerHTML={{
-						__html: marked.parse(selectedNoteContent),
-					}}
-				/>
-			</div>
-		);
-	}
-
 	return (
 		<div className="workspace">
-			<SimpleMDE
-				value={value}
-				onChange={onChange}
-				options={editorOptions}
-				getMdeInstance={getMdeInstanceCallback}
-				getLineAndCursor={getLineAndCursorCallback}
-			/>
+			<div className="title-and-search">
+				<div className="title">
+					<label>Title: </label>
+					<Input value={title} onChange={onTitleChange} />
+				</div>
+				<div className="search">
+					<label>Search: </label>
+					<Input
+						value={searchValue}
+						onChange={onSearchValueChange}
+						prefix={<SearchOutlined />}
+					/>
+				</div>
+			</div>
+			<div className="contentArea">
+				{isEditMode ? (
+					<SimpleMDE
+						className="editor"
+						value={content}
+						onChange={onContentChange}
+						options={editorOptions}
+						getMdeInstance={getMdeInstanceCallback}
+						getLineAndCursor={getLineAndCursorCallback}
+					/>
+				) : (
+					<div
+						className="content"
+						dangerouslySetInnerHTML={{
+							__html: marked.parse(selectedNoteContent),
+						}}
+					/>
+				)}
+			</div>
 		</div>
 	);
 };

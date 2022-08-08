@@ -17,3 +17,12 @@ export const setNoteContent = async (id: string | null, content: string) => {
 			.modify({ content, dateEdited: new Date() });
 	}
 };
+
+export const setNoteTitle = async (id: string | null, title: string) => {
+	if (id) {
+		await db.notes
+			.where("id")
+			.equals(id)
+			.modify({ title, dateEdited: new Date() });
+	}
+};

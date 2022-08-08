@@ -1,6 +1,11 @@
 import React from "react";
 import { INote } from "./types";
-import { addNote, deleteNote, setNoteContent } from "./notesService";
+import {
+	addNote,
+	deleteNote,
+	setNoteContent,
+	setNoteTitle,
+} from "./notesService";
 import { generateId } from "./utils";
 
 export interface INotesContext {
@@ -12,6 +17,7 @@ export interface INotesContext {
 	setSelectedNoteId: (id: string | null) => void;
 	isEditMode: boolean;
 	setIsEditMode: (isEditMode: boolean) => void;
+	setNoteTitle: (id: string | null, title: string) => Promise<void>;
 }
 
 const NotesContext = React.createContext<INotesContext>({
@@ -35,6 +41,7 @@ const NotesContext = React.createContext<INotesContext>({
 	setNoteContent,
 	isEditMode: false,
 	setIsEditMode: (isEditMode: boolean) => {},
+	setNoteTitle,
 });
 
 export default NotesContext;
